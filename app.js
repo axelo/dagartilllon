@@ -16,7 +16,7 @@ var view_index_rendered_cachedate;
 app.use(route.get('/', view_index));
 app.use(serve('./static'));
 
-app.listen(3000);
+app.listen(process.env.PORT || 3000);
 
 function *view_index() {
   var server_date = moment(); //moment([2015, 6, 20]);
