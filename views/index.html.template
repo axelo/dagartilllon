@@ -1,0 +1,24 @@
+<!doctype html>
+<html>
+  <head>
+    <title>Dagar till lön</title>
+    <meta charset="utf8"> 
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+    <meta name="format-detection" content="telephone=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <link rel="apple-touch-icon" sizes="76x76" href="/images/touch-icon-ipad.png">
+    <link rel="apple-touch-icon" sizes="120x120" href="/images/touch-icon-iphone-retina.png">
+    <link rel="apple-touch-icon" sizes="152x152" href="/images/touch-icon-ipad-retina.png">
+    <link rel="stylesheet" href="/css/style.css">
+  </head>
+  <body>
+    <div id="content">
+      <h1><span id="days">{{days}}</span><span class="subheader">dagar kvar till lön</span></h1>
+      <input id="money" type="number" placeholder="KRONOR" onchange="onmoney_change()" onkeydown="dismiss_on_retur(event)"><label for="money" id="money_label" class="subheader">kvar på kontot</label>
+      <div></div>
+      <h2 id="money_per_day">&nbsp;</h2> <span class="subheader">kronor / dag</span>
+    </div>
+    <script src="/js/money_per_day.js"></script>
+  </body>
+</html>
