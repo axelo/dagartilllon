@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "app": "node app.js"
+    "start": "node --harmony app.js"
   },
   "author": "axelo",
   "license": "ISC",
