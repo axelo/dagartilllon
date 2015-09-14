@@ -14,11 +14,22 @@
   </head>
   <body>
     <div id="content">
-      <h1><span id="days">{{days}}</span><span class="subheader">dagar kvar till lön</span></h1>
-      <input id="money" type="number" placeholder="KRONOR" onchange="onmoney_change()" onkeydown="dismiss_on_retur(event)"><label for="money" id="money_label" class="subheader">kvar på kontot</label>
-      <div></div>
-      <h2 id="money_per_day">&nbsp;</h2> <span class="subheader">kronor / dag</span>
+      <div>
+        <div id="days" class="left-col">{{days}}</div>
+        <div class="right-col">dagar kvar till lön</div>
+      </div>
+      <div>
+        <div class="left-col">
+          <input id="money" type="number" placeholder="KR">
+        </div>
+        <label id="money-label" class="right-col" for="money">kvar på kontot</label>
+      </div>
+      <div id="money-a-day-row">
+        <div id="money-a-day" class="left-col"></div>
+        <div class="right-col">kr / dag</div>
+      </div>
     </div>
-    <script src="/js/money_per_day.js"></script>
+    <script src="/js/app.js"></script>
   </body>
+  <!-- https://github.com/axelo -->
 </html>
