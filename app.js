@@ -41,9 +41,7 @@ function *dagar_kvar(year, month, day) {
   try {
     var response = yield request({
       url: 'http://api.dryg.net/dagar/v2.1/' + year + '/' + month,
-      headers: {
-      'User-Agent': 'dagarkvartilllon-request'
-      }
+      headers: { 'User-Agent': 'dagarkvartilllon-request' }
     });
   } catch (error) {
     return { error: 503 };
@@ -71,5 +69,3 @@ function *dagar_kvar(year, month, day) {
      return { error: 400 };
   }
 }
-
-
