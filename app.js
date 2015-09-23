@@ -39,41 +39,6 @@ function *view_index() {
   this.body = view_index_rendered;
 }
 
-function *get_pay_day_of_month(year, month) {
-  let response = yield request({
-    url: 'http://api.dryg.net/dagar/v2.1/' + year + '/' + month,
-    headers: { 'User-Agent': 'dagarkvartilllon-request' }
-  });
-
-  var dagar = JSON.parse(response.body);
-
-  var pay_day_i = 24;
-  var pay_day = dagar.dagar[pay_day_i];
-
-  while (pay_day['arbetsfri dag'] === 'Ja' && pay_day_i >= 0) pay_day = dagar.dagar[--pay_day_i];
-
-  return pay_day_i + 1;
-}
-
-function *get_closest_pay_date_from(year, month, day) {
-  var pay_day = yield get_pay_day_of_month(year, month);
-
-  if (pay_day <= 0) throw 'Could not find pay day';
-
-  if (pay_day <= day) {
-    ++month;
-
-    if (month > 12) {
-        ++year
-        month = 1;
-    }
-
-    pay_day = yield get_pay_day_of_month(year, month);
-  }
-
-  return [year, month - 1, pay_day]; // month 0..11
-}
-
 function *dagar_kvar(year, month, day) {
   try {
     let pay_date_arr = yield get_closest_pay_date_from(year, month, day);
@@ -95,4 +60,39 @@ function *dagar_kvar(year, month, day) {
   } catch (error) {
      return { error: 503 };
   }
+}
+
+function *get_closest_pay_date_from(year, month, day) {
+  var pay_day = yield get_pay_day_of_month(year, month);
+
+  if (pay_day > 0 && pay_day <= day) {
+    ++month;
+
+    if (month > 12) {
+        ++year
+        month = 1;
+    }
+
+    pay_day = yield get_pay_day_of_month(year, month);
+  }
+
+  if (pay_day <= 0) throw 'Could not find pay day';
+
+  return [year, month - 1, pay_day]; // month 0..11
+}
+
+function *get_pay_day_of_month(year, month) {
+  let response = yield request({
+    url: 'http://api.dryg.net/dagar/v2.1/' + year + '/' + month,
+    headers: { 'User-Agent': 'dagarkvartilllon-request' }
+  });
+
+  var dagar = JSON.parse(response.body);
+
+  var pay_day_i = 24;
+  var pay_day = dagar.dagar[pay_day_i];
+
+  while (pay_day['arbetsfri dag'] === 'Ja' && pay_day_i >= 0) pay_day = dagar.dagar[--pay_day_i];
+
+  return pay_day_i + 1;
 }
