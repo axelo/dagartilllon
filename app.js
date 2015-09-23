@@ -1,15 +1,18 @@
-var fs = require('fs');
+'use strict';
 
-var route = require('koa-route');
-var serve = require('koa-static');
+let fs = require('fs');
 
-var koa = require('koa');
-var app = koa();
+let route = require('koa-route');
+let serve = require('koa-static');
 
-var request = require('koa-request');
-var moment = require('moment');
+let koa = require('koa');
+let app = koa();
 
-var view_index_template = fs.readFileSync('./views/index.html.template', 'utf8');
+let request = require('koa-request');
+let moment = require('moment');
+
+let view_index_template = fs.readFileSync('./views/index.html.template', 'utf8');
+
 var view_index_rendered;
 var view_index_rendered_cachedate;
 
@@ -19,10 +22,11 @@ app.use(serve('./static'));
 app.listen(process.env.PORT || 3000);
 
 function *view_index() {
-  var server_date = moment(); //moment([2015, 6, 20]);
+  let server_date = moment();
+  //let server_date = moment([2015, 10 - 1, 23]);
 
   if (!view_index_rendered || server_date.format('YYYY-MM-DD') !== view_index_rendered_cachedate) {
-    var days_left = yield dagar_kvar(server_date.year(), server_date.month() + 1, server_date.date());
+    let days_left = yield dagar_kvar(server_date.year(), server_date.month() + 1, server_date.date());
 
     if (days_left.error) {
       return this.throw(days_left.error);
@@ -35,37 +39,60 @@ function *view_index() {
   this.body = view_index_rendered;
 }
 
-function *dagar_kvar(year, month, day) {
-  var response;
+function *get_pay_day_of_month(year, month) {
+  let response = yield request({
+    url: 'http://api.dryg.net/dagar/v2.1/' + year + '/' + month,
+    headers: { 'User-Agent': 'dagarkvartilllon-request' }
+  });
 
-  try {
-    var response = yield request({
-      url: 'http://api.dryg.net/dagar/v2.1/' + year + '/' + month,
-      headers: { 'User-Agent': 'dagarkvartilllon-request' }
-    });
-  } catch (error) {
-    return { error: 503 };
+  var dagar = JSON.parse(response.body);
+
+  var pay_day_i = 24;
+  var pay_day = dagar.dagar[pay_day_i];
+
+  while (pay_day['arbetsfri dag'] === 'Ja' && pay_day_i >= 0) pay_day = dagar.dagar[--pay_day_i];
+
+  return pay_day_i + 1;
+}
+
+function *get_closest_pay_date_from(year, month, day) {
+  var pay_day = yield get_pay_day_of_month(year, month);
+
+  if (pay_day <= 0) throw 'Could not find pay day';
+
+  if (pay_day <= day) {
+    ++month;
+
+    if (month > 12) {
+        ++year
+        month = 1;
+    }
+
+    pay_day = yield get_pay_day_of_month(year, month);
   }
 
+  return [year, month - 1, pay_day]; // month 0..11
+}
+
+function *dagar_kvar(year, month, day) {
   try {
-    var today = moment([year, parseInt(month) - 1, day]).startOf('day');
-    var dagar = JSON.parse(response.body);
+    let pay_date_arr = yield get_closest_pay_date_from(year, month, day);
 
-    var pay_day_i = 24;
-    var pay_day = dagar.dagar[pay_day_i];
+    let pay_date = moment(pay_date_arr).startOf('day');
+    let today = moment([year, month - 1, day]).startOf('day');
+    
+    if (!today.isValid() || !pay_date.isValid()) {
+      return { error: 400 };
+    }
 
-    while (pay_day['arbetsfri dag'] === 'Ja' && pay_day_i >= 0) pay_day = dagar.dagar[--pay_day_i];
-
-    if (pay_day_i < 0) return { error: 503 };
-
-    var days_until_pay = -today.diff(pay_day.datum, 'days');
+    let days_until_pay = -today.diff(pay_date, 'days');
 
     return {
       days_left: days_until_pay,
-      pay_date: pay_day.datum,
+      pay_date: pay_date.format('YYYY-MM-DD'),
       today_date: today.format('YYYY-MM-DD')
     };
   } catch (error) {
-     return { error: 400 };
+     return { error: 503 };
   }
 }
