@@ -1,3 +1,3 @@
-# dagartilllon
+# Dagar kvar till lön
 
-[Live link here](http://dagartilllon.cloudcontrolapp.com)
+[Live link here](https://dagartilllon.herokuapp.com/)
