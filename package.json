@@ -2,20 +2,29 @@
   "name": "dagartilllon",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "main": "dist/app.js",
   "scripts": {
-    "start": "node app.js"
+    "start": "ts-node --files app.ts",
+    "start:js": "node dist/app.js",
+    "build": "tsc",
+    "postinstall": "npm run build"
   },
   "author": "axelo",
-  "license": "ISC",
+  "license": "MIT",
   "engines": {
-    "node": "4.1.1"
+    "node": "11"
   },
   "dependencies": {
-    "koa": "^1.0.0",
-    "koa-request": "^1.0.0",
-    "koa-route": "^2.4.2",
-    "koa-static": "^1.4.9",
-    "moment": "^2.10.6"
+    "@types/koa-route": "^3.2.4",
+    "@types/koa-static": "^4.0.1",
+    "@types/node": "^11.13.8",
+    "elmish-core-ts": "0.0.2-alpha",
+    "koa": "^2.7.0",
+    "koa-route": "^3.2.0",
+    "koa-static": "^5.0.0"
+  },
+  "devDependencies": {
+    "ts-node": "^8.1.0",
+    "typescript": "^3.4.5"
   }
 }
